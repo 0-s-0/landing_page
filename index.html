@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#03170a" />
+    <title>GAJA VIP</title>
+
+    <!-- 把 ./public/5.jpg 和本 HTML 放在同一目录 -->
+    <link rel="preload" href="./public/5.jpg" as="image" type="image/jpeg" />
+
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      html,
+      body {
+        width: 100%;
+        min-height: 100%;
+        background: #03170a;
+        font-family: Arial, Helvetica, sans-serif;
+        overflow-x: hidden;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+      }
+
+      button {
+        font-family: inherit;
+      }
+
+      .page {
+        position: relative;
+        width: 100%;
+        max-width: 520px;
+        min-height: 100vh;
+        background: #03170a;
+        box-shadow: 0 0 45px rgba(0, 0, 0, 0.85);
+        padding-bottom: calc(104px + env(safe-area-inset-bottom));
+      }
+
+      .long-image {
+        display: block;
+        width: 100%;
+        height: auto;
+        vertical-align: top;
+        user-select: none;
+        -webkit-user-drag: none;
+      }
+
+      .top-install {
+        position: fixed;
+        z-index: 40;
+        top: calc(12px + env(safe-area-inset-top));
+        right: max(12px, calc((100vw - 520px) / 2 + 12px));
+        min-width: 96px;
+        min-height: 38px;
+        border: none;
+        border-radius: 999px;
+        color: #421000;
+        font-size: 13px;
+        line-height: 1;
+        font-weight: 900;
+        letter-spacing: 0.3px;
+        background: linear-gradient(
+          180deg,
+          #fffbd1 0%,
+          #ffe46c 18%,
+          #ffc32f 47%,
+          #f09000 77%,
+          #c75500 100%
+        );
+        box-shadow:
+          0 0 14px rgba(255, 215, 91, 0.62),
+          0 4px 0 #5b1d00,
+          inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+        cursor: pointer;
+      }
+
+      .bottom-bar {
+        position: fixed;
+        z-index: 45;
+        left: 50%;
+        bottom: calc(12px + env(safe-area-inset-bottom));
+        width: min(calc(100% - 28px), 492px);
+        transform: translateX(-50%);
+        pointer-events: none;
+      }
+
+      .button-stage {
+        position: relative;
+        width: 100%;
+        padding: 3px 0 7px;
+        isolation: isolate;
+        pointer-events: auto;
+      }
+
+      .button-stage::before,
+      .button-stage::after {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        left: 4%;
+        right: 4%;
+        top: 3px;
+        bottom: 7px;
+        border: 1px solid rgba(255, 206, 75, 0.55);
+        border-radius: 22px;
+        opacity: 0;
+        pointer-events: none;
+        animation: ringPulse 2.1s ease-out infinite;
+      }
+
+      .button-stage::after {
+        animation-delay: 1.05s;
+      }
+
+      .claim-button {
+        position: relative;
+        width: 100%;
+        min-height: 68px;
+        overflow: hidden;
+        border: none;
+        border-radius: 18px;
+        background: linear-gradient(
+          180deg,
+          #fffbd1 0%,
+          #ffe46c 18%,
+          #ffc32f 47%,
+          #f09000 77%,
+          #c75500 100%
+        );
+        color: #421000;
+        font-size: 26px;
+        line-height: 1;
+        font-weight: 900;
+        letter-spacing: 0.8px;
+        cursor: pointer;
+        box-shadow:
+          0 0 18px rgba(255, 215, 91, 0.72),
+          0 0 42px rgba(255, 157, 0, 0.42),
+          0 8px 0 #5b1d00,
+          inset 0 0 0 2px rgba(255, 255, 255, 0.72),
+          inset 0 -8px 18px rgba(131, 42, 0, 0.22);
+        animation: buttonGlow 1.55s ease-in-out infinite;
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease,
+          filter 0.15s ease;
+      }
+
+      .claim-button::before {
+        content: "";
+        position: absolute;
+        top: -70%;
+        left: -55%;
+        width: 32%;
+        height: 240%;
+        transform: rotate(24deg);
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.88),
+          transparent
+        );
+        animation: shine 2.65s ease-in-out infinite;
+      }
+
+      .claim-button::after {
+        content: "";
+        position: absolute;
+        left: 10%;
+        right: 10%;
+        top: 5px;
+        height: 1px;
+        border-radius: 50%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.9),
+          transparent
+        );
+      }
+
+      .button-content {
+        position: relative;
+        z-index: 2;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .button-arrow {
+        display: inline-block;
+        font-size: 23px;
+        line-height: 1;
+        animation: arrowMove 1.1s ease-in-out infinite;
+      }
+
+      .claim-button:hover {
+        filter: brightness(1.08);
+      }
+
+      .claim-button:active,
+      .top-install:active {
+        transform: translateY(4px) scale(0.99);
+      }
+
+      .claim-button:disabled,
+      .top-install:disabled {
+        opacity: 0.82;
+        cursor: default;
+        animation: none;
+      }
+
+      @keyframes shine {
+        0%,
+        45% {
+          left: -55%;
+        }
+        72%,
+        100% {
+          left: 125%;
+        }
+      }
+
+      @keyframes buttonGlow {
+        0%,
+        100% {
+          transform: translateY(0) scale(1);
+          filter: brightness(1);
+        }
+        50% {
+          transform: translateY(-2px) scale(1.018);
+          filter: brightness(1.12);
+        }
+      }
+
+      @keyframes ringPulse {
+        0% {
+          transform: scale(0.96);
+          opacity: 0.5;
+        }
+        100% {
+          transform: scale(1.08);
+          opacity: 0;
+        }
+      }
+
+      @keyframes arrowMove {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        50% {
+          transform: translateX(5px);
+        }
+      }
+
+      .device-blocker {
+        position: fixed;
+        z-index: 999;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: rgba(0, 0, 0, 0.86);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+
+      .device-blocker.show {
+        display: flex;
+      }
+
+      .device-card {
+        width: min(100%, 420px);
+        padding: 28px 22px 24px;
+        border: 1px solid rgba(255, 210, 78, 0.48);
+        border-radius: 22px;
+        text-align: center;
+        color: #fff6cc;
+        background:
+          radial-gradient(
+            circle at top,
+            rgba(255, 190, 40, 0.18),
+            transparent 48%
+          ),
+          linear-gradient(180deg, #0a2412 0%, #03170a 100%);
+        box-shadow:
+          0 0 28px rgba(255, 188, 38, 0.18),
+          0 18px 60px rgba(0, 0, 0, 0.72);
+      }
+
+      .device-icon {
+        display: block;
+        margin-bottom: 14px;
+        font-size: 48px;
+        line-height: 1;
+      }
+
+      .device-title {
+        margin-bottom: 10px;
+        font-size: 24px;
+        line-height: 1.2;
+        font-weight: 900;
+        color: #ffd85a;
+      }
+
+      .device-message {
+        font-size: 15px;
+        line-height: 1.65;
+        color: rgba(255, 255, 255, 0.86);
+      }
+
+      body.download-blocked {
+        overflow: hidden;
+      }
+
+      @media (max-width: 380px) {
+        .claim-button {
+          min-height: 62px;
+          font-size: 22px;
+        }
+
+        .button-arrow {
+          font-size: 20px;
+        }
+
+        .page {
+          padding-bottom: calc(96px + env(safe-area-inset-bottom));
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .button-stage::before,
+        .button-stage::after,
+        .claim-button,
+        .claim-button::before,
+        .button-arrow {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <main class="page">
+      <img class="long-image" src="./public/5.jpg" alt="GAJA VIP landing page" />
+    </main>
+
+    <button
+      class="top-install"
+      id="topInstallButton"
+      type="button"
+      aria-label="Install GAJA VIP"
+    >
+      INSTALL
+    </button>
+
+    <div class="bottom-bar">
+      <div class="button-stage">
+        <button
+          class="claim-button"
+          id="claimButton"
+          type="button"
+          aria-label="Install GAJA VIP"
+        >
+          <span class="button-content">
+            <span id="buttonText">INSTALL NOW</span>
+            <span class="button-arrow" aria-hidden="true">›</span>
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="device-blocker"
+      id="deviceBlocker"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="deviceTitle"
+    >
+      <div class="device-card">
+        <span class="device-icon" aria-hidden="true">📱</span>
+        <h2 class="device-title" id="deviceTitle">ANDROID PHONE ONLY</h2>
+        <p class="device-message" id="deviceMessage">
+          Please open this page on an Android phone to download the APK.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      "use strict";
+
+      const APK_URL = "https://a91.top/api/v1/auto_app/download";
+
+      const claimButton = document.getElementById("claimButton");
+      const topInstallButton = document.getElementById("topInstallButton");
+      const buttonText = document.getElementById("buttonText");
+      const deviceBlocker = document.getElementById("deviceBlocker");
+      const deviceMessage = document.getElementById("deviceMessage");
+
+      let downloadAllowed = false;
+
+      function buildDownloadUrl() {
+        const apkUrl = new URL(APK_URL);
+
+        new URLSearchParams(window.location.search).forEach((value, key) => {
+          const trimmed = String(value || "").trim();
+          if (trimmed) {
+            apkUrl.searchParams.set(key, trimmed);
+          }
+        });
+
+        return apkUrl.toString();
+      }
+
+      function isAndroidDevice() {
+        const userAgent = navigator.userAgent || navigator.vendor || "";
+        return /Android|Adr/i.test(userAgent);
+      }
+
+      function applyDeviceRestriction() {
+        const userAgent = navigator.userAgent || navigator.vendor || "";
+
+        downloadAllowed = isAndroidDevice();
+
+        if (downloadAllowed) {
+          document.body.classList.remove("download-blocked");
+          deviceBlocker.classList.remove("show");
+          deviceBlocker.setAttribute("aria-hidden", "true");
+          resetButton();
+          return;
+        }
+
+        claimButton.disabled = true;
+        topInstallButton.disabled = true;
+        buttonText.textContent = "ANDROID ONLY";
+        topInstallButton.textContent = "ANDROID ONLY";
+        deviceMessage.textContent = /iPhone|iPad|iPod/i.test(userAgent)
+          ? "APK files can only be installed on Android phones. Please open this page on an Android phone."
+          : "Please open this page on an Android phone to download the APK.";
+
+        document.body.classList.add("download-blocked");
+        deviceBlocker.classList.add("show");
+        deviceBlocker.setAttribute("aria-hidden", "false");
+      }
+
+      function resetButton() {
+        if (!downloadAllowed) return;
+
+        claimButton.disabled = false;
+        topInstallButton.disabled = false;
+        buttonText.textContent = "INSTALL NOW";
+        topInstallButton.textContent = "INSTALL";
+      }
+
+      function goDownload() {
+        if (!downloadAllowed) {
+          applyDeviceRestriction();
+          return;
+        }
+
+        if (claimButton.disabled || topInstallButton.disabled) {
+          return;
+        }
+
+        claimButton.disabled = true;
+        topInstallButton.disabled = true;
+        buttonText.textContent = "DOWNLOADING...";
+        topInstallButton.textContent = "OPENING";
+
+        window.setTimeout(function () {
+          window.location.assign(buildDownloadUrl());
+        }, 120);
+
+        window.setTimeout(resetButton, 5000);
+      }
+
+      claimButton.addEventListener("click", goDownload);
+      topInstallButton.addEventListener("click", goDownload);
+      window.addEventListener("pageshow", applyDeviceRestriction);
+      applyDeviceRestriction();
+    </script>
+  </body>
+</html>
